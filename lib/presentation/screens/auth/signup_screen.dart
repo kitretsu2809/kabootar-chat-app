@@ -1,9 +1,12 @@
 import 'package:firebasetesting/core/common/custom_button.dart';
 import 'package:firebasetesting/data/services/service_locator.dart';
+import 'package:firebasetesting/logic/cubits/auth/auth_cubit.dart';
+import 'package:firebasetesting/logic/cubits/auth/auth_state.dart';
 import 'package:firebasetesting/presentation/screens/auth/login_screen.dart';
 import 'package:firebasetesting/router/app_router.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:validators/validators.dart';
 import '../../../core/common/custom_text_field.dart';
 import '../../../data/repositories/auth_repository.dart';
@@ -110,7 +113,20 @@ class _SignupScreenState extends State<SignupScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+    return BlocConsumer<AuthCubit, AuthState>(
+      bloc: getIt<AuthCubit>(),
+
+      listener: (context, state) {
+        if (state.status == AuthStatus.authenticated) {
+          getIt<AppRouter>().pushAndRemoveUntil(const Scaffold(),);
+        }else if (state.status == AuthStatus.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error ?? '')),
+          );
+        }
+        },
+    builder:(context, state) => Scaffold(
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20),
@@ -255,6 +271,7 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

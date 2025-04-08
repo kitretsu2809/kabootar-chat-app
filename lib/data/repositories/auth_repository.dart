@@ -7,6 +7,11 @@ import '../services/base_repository.dart';
 
 class AuthRepository extends BaseRepository {
   Stream<User?> get authStateChanges => auth.authStateChanges();
+   final FirebaseAuth _firebaseAuth;
+
+  AuthRepository(this._firebaseAuth);
+
+  User? get currentUser => _firebaseAuth.currentUser;
 
 
   Future<UserModel> signUp({
